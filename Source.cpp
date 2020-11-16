@@ -16,15 +16,25 @@ int main()
     sf::RenderWindow window(sf::VideoMode(1024, 768), "GAME 230 - Pong");
     window.setVerticalSyncEnabled(true);
 
-    //Define shape as circle
-    sf::CircleShape shape(100.f);
-    //Set the circle Position
-    shape.setPosition(412, 284);
-    //Define Purple
-    sf::Color Purple(90, 24, 154);
-    //Set the colour of the circle
-    shape.setFillColor(Purple);
 
+    //Load Font
+    sf::Font font;
+    if (!font.loadFromFile("data/Fonts/OpenSans-Regular.ttf")) {
+        return 1;
+    }
+
+
+    sf::Text title;
+    title.setFont(font);
+    title.setCharacterSize(12);
+    title.setFillColor(sf::Color::Red);
+    title.setPosition(0, 40);
+
+    //Define shape, position & colour
+    sf::CircleShape shape(100.f);
+    shape.setPosition(412, 284);
+    sf::Color Purple(90, 24, 154);
+    shape.setFillColor(Purple);
     sf::Clock clock;
     float deltaTime = 0.0f;
 
@@ -44,10 +54,11 @@ int main()
         }
 
         auto position = shape.getPosition();
-        shape.setPosition(position.x + 0.1, position.y + 0.1);
+        shape.setPosition(position.x + 50 * deltaTime, position.y + 50 * deltaTime);
 
         //Render
         window.clear();
+        window.draw(title);
         window.draw(shape);
         window.display();
     }
