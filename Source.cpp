@@ -10,19 +10,22 @@
 
 using namespace std;
 
+
 int main()
 {
+    const int WIDTH = 1024;
+    const int HEIGHT = 768;
+    const int SPEED = 500.0f;
+
     //Define Window dimensions and program title
     sf::RenderWindow window(sf::VideoMode(1024, 768), "GAME 230 - Pong");
     window.setVerticalSyncEnabled(true);
-
 
     //Load Font
     sf::Font font;
     if (!font.loadFromFile("data/Fonts/OpenSans-Regular.ttf")) {
         return 1;
     }
-
 
     sf::Text title;
     title.setFont(font);
@@ -37,6 +40,7 @@ int main()
     shape.setFillColor(Purple);
     sf::Clock clock;
     float deltaTime = 0.0f;
+    sf::Vector2f velocity(0, SPEED);
 
 
     //Update
@@ -54,7 +58,15 @@ int main()
         }
 
         auto position = shape.getPosition();
-        shape.setPosition(position.x + 50 * deltaTime, position.y + 50 * deltaTime);
+        shape.setPosition(position.x + velocity.x * deltaTime, position.y + velocity.y * deltaTime);
+
+        if (position.y > HEIGHT - shape.getRadius() * 2) {
+            velocity.y = -SPEED;
+        }
+
+        if (position.y <= 0.0f) {
+            velocity.y = SPEED;
+        }
 
         //Render
         window.clear();
