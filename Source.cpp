@@ -8,6 +8,7 @@
 #include <SFML/OpenGL.hpp>
 #include <SFML/Main.hpp>
 #include "Collider.h"
+#include "Paddle.h"
 
 using namespace std;
 
@@ -51,11 +52,11 @@ struct Ball {
 };
 
 
-struct Paddle
+struct PaddleS
 {
     sf::RectangleShape dimensions;
     sf::Vector2f postion;
-    int playerNumber; //Changes what keys the player presses to move their paddle
+    int playerNumber = 0; //Changes what keys the player presses to move their paddle
 
     //Reads player input and moves the players' paddle
     void movePaddle(int playerNumber, float deltaTime) {
@@ -94,7 +95,6 @@ struct Paddle
     }
 };
 
-
 int main()
 {
 
@@ -117,17 +117,13 @@ int main()
     ball1.velocity = sf::Vector2f(0,0);
 
     //Create Paddle(s)
-    Paddle leftPaddle;
+    Paddle newPaddle(sf::Vector2f(50,150), sf::Vector2f(200, 200));
+
+    PaddleS leftPaddle;
     leftPaddle.dimensions.setSize(sf::Vector2f(50, 150));
     leftPaddle.dimensions.setFillColor(myGreen);
     leftPaddle.dimensions.setPosition(50, HEIGHT / 2 - leftPaddle.dimensions.getSize().y);
     leftPaddle.playerNumber = 0;
-
-    Paddle rightPaddle;
-    rightPaddle.dimensions.setSize(sf::Vector2f(50, 150));
-    rightPaddle.dimensions.setFillColor(myGreen);
-    rightPaddle.dimensions.setPosition(924, HEIGHT/ 2 - rightPaddle.dimensions.getSize().y);
-    rightPaddle.playerNumber = 1;
 
 
     //Create Dashed Lines
@@ -178,12 +174,10 @@ int main()
 
         //Check player input for paddle
         leftPaddle.postion = sf::Vector2f(leftPaddle.dimensions.getPosition().x, leftPaddle.dimensions.getPosition().y);
-        rightPaddle.postion = sf::Vector2f(rightPaddle.dimensions.getPosition().x, rightPaddle.dimensions.getPosition().y);
 
 
         ball1.Update(deltaTime);
         leftPaddle.movePaddle(leftPaddle.playerNumber, deltaTime);
-        rightPaddle.movePaddle(rightPaddle.playerNumber, deltaTime);
         title.setString("Hello, World!");
 
         //Render
@@ -191,8 +185,8 @@ int main()
         window.draw(title);
        // window.draw(line1);
        // window.draw(line2)
+        newPaddle.draw(window);
         leftPaddle.draw(&window);
-        rightPaddle.draw(&window);
         ball1.draw(&window);
         window.display();
     }

@@ -8,6 +8,10 @@ Paddle::Paddle(sf::Vector2f size, sf::Vector2f position)
 	body.setPosition(position);
 }
 
+Paddle::~Paddle()
+{
+}
+
 
 void Paddle::draw(sf::RenderWindow& window)
 {
