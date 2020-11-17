@@ -8,6 +8,7 @@
 #include <SFML/OpenGL.hpp>
 #include <SFML/Main.hpp>
 #include "Collider.h"
+#include "Paddle.h"
 
 using namespace std;
 
