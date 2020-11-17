@@ -96,6 +96,10 @@ struct Paddle
 
 int main()
 {
+
+    int center_W = WIDTH / 2;
+    int center_H = HEIGHT / 2;
+
     //Define Window dimensions and program title
     sf::RenderWindow window(sf::VideoMode(1024, 768), "GAME 230 - Pong");
     window.setVerticalSyncEnabled(true);
@@ -108,22 +112,37 @@ int main()
     Ball ball1;
     ball1.shape = sf::CircleShape(25.f);
     ball1.shape.setFillColor(Purple);
-    ball1.shape.setPosition(WIDTH / 2, HEIGHT / 2);
-    ball1.velocity = sf::Vector2f(_ballSpeed, _ballSpeed);
+    ball1.shape.setPosition(WIDTH / 2, HEIGHT / 2 - ball1.shape.getRadius() * 2);
+    ball1.velocity = sf::Vector2f(0,0);
 
     //Create Paddle(s)
     Paddle leftPaddle;
     leftPaddle.dimensions.setSize(sf::Vector2f(50, 150));
     leftPaddle.dimensions.setFillColor(myGreen);
-    leftPaddle.dimensions.setPosition(50, 100);
+    leftPaddle.dimensions.setPosition(50, HEIGHT / 2 - leftPaddle.dimensions.getSize().y);
     leftPaddle.playerNumber = 0;
 
     Paddle rightPaddle;
     rightPaddle.dimensions.setSize(sf::Vector2f(50, 150));
     rightPaddle.dimensions.setFillColor(myGreen);
-    rightPaddle.dimensions.setPosition(924, 100);
+    rightPaddle.dimensions.setPosition(924, HEIGHT/ 2 - rightPaddle.dimensions.getSize().y);
     rightPaddle.playerNumber = 1;
-   
+
+
+    //Create Dashed Lines
+    sf::Vertex point;
+    point.position = sf::Vector2f(WIDTH / 2, HEIGHT / 2);
+    point.color = sf::Color::White;
+    
+    sf::VertexArray line1(sf::Points, HEIGHT);
+    for (int i = 0; i < HEIGHT; i++) {
+        line1[i].position = sf::Vector2f(center_W - 10, i * 10);
+    }
+
+    sf::VertexArray line2(sf::Points, HEIGHT);
+    for (int i = 0; i < HEIGHT; i++) {
+        line2[i].position = sf::Vector2f(center_W + 10, i * 10);
+    }
 
     //Load Font
     sf::Font font;
@@ -159,7 +178,7 @@ int main()
         //Check player input for paddle
         leftPaddle.postion = sf::Vector2f(leftPaddle.dimensions.getPosition().x, leftPaddle.dimensions.getPosition().y);
         rightPaddle.postion = sf::Vector2f(rightPaddle.dimensions.getPosition().x, rightPaddle.dimensions.getPosition().y);
-        
+
 
         ball1.Update(deltaTime);
         leftPaddle.movePaddle(leftPaddle.playerNumber, deltaTime);
@@ -169,6 +188,8 @@ int main()
         //Render
         window.clear();
         window.draw(title);
+        window.draw(line1);
+        window.draw(line2);
         leftPaddle.draw(&window);
         rightPaddle.draw(&window);
         ball1.draw(&window);
@@ -176,4 +197,4 @@ int main()
     }
 
     return 0;
-}
+};
