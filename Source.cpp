@@ -24,6 +24,8 @@ struct Ball {
         auto position = this->shape.getPosition();
         this->shape.setPosition(position.x + this->velocity.x * deltaTime, position.y + this->velocity.y * deltaTime);
 
+
+        //Check if the ball touches bounds of window
         if (position.y > HEIGHT - this->shape.getRadius() * 2) {
             this->velocity.y = -abs(this->velocity.y);
         }
@@ -53,6 +55,7 @@ int main()
     sf::RenderWindow window(sf::VideoMode(1024, 768), "GAME 230 - Pong");
     window.setVerticalSyncEnabled(true);
 
+    //Custom Colours
     sf::Color Purple(90, 24, 154);
     sf::Color myGreen(45, 194, 67);
 
@@ -62,11 +65,6 @@ int main()
     ball1.shape.setPosition(WIDTH / 2, HEIGHT / 2);
     ball1.velocity = sf::Vector2f(SPEED, SPEED);
 
-    Ball ball2;
-    ball2.shape = sf::CircleShape(50.f);
-    ball2.shape.setFillColor(myGreen);
-    ball2.shape.setPosition(100, 100);
-    ball2.velocity = sf::Vector2f(SPEED, SPEED);
     
     //Load Font
     sf::Font font;
