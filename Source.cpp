@@ -49,6 +49,31 @@ struct Ball {
 };
 
 
+struct Paddle
+{
+    sf::RectangleShape dimensions;
+    sf::Vector2f postion;
+    int playerNumber; //Changes what keys the player presses to move their paddle
+
+    void movePaddle(int playerNumber, float deltaTime) {
+       
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && this->postion.y > 0.0f) {
+
+            this->dimensions.setPosition(this->postion.x, this->postion.y - SPEED * deltaTime);
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && this->postion.y < (HEIGHT - this->dimensions.getSize().y)) {
+
+            this->dimensions.setPosition(this->postion.x, this->postion.y + SPEED * deltaTime);
+        }
+    }
+
+    void draw(sf::RenderWindow* window) {
+        window->draw(this->dimensions);
+    }
+};
+
+
 int main()
 {
     //Define Window dimensions and program title
@@ -66,10 +91,11 @@ int main()
     ball1.velocity = sf::Vector2f(SPEED, SPEED);
 
     //Create Paddle
-    sf::RectangleShape paddle;
-    paddle.setSize(sf::Vector2f(50,150));
-    paddle.setFillColor(myGreen);
-    paddle.setPosition(100, 100);
+    Paddle leftPaddle;
+    leftPaddle.dimensions.setSize(sf::Vector2f(50, 150));
+    leftPaddle.dimensions.setFillColor(myGreen);
+    leftPaddle.dimensions.setPosition(100, 100);
+    leftPaddle.playerNumber = 0;
    
 
     //Load Font
@@ -103,28 +129,18 @@ int main()
                 window.close();
         }
 
-        //Check player input
-
-        sf::Vector2f paddlePos = sf::Vector2f(paddle.getPosition().x, paddle.getPosition().y);
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-
-            paddle.setPosition(paddlePos.x, paddlePos.y - SPEED * deltaTime);
-
-        }
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-
-            paddle.setPosition(paddlePos.x, paddlePos.y + SPEED *deltaTime);
-
-        }
+        //Check player input for paddle
+        leftPaddle.postion = sf::Vector2f(leftPaddle.dimensions.getPosition().x, leftPaddle.dimensions.getPosition().y);
+        
 
         ball1.Update(deltaTime);
+        leftPaddle.movePaddle(leftPaddle.playerNumber, deltaTime);
         title.setString("Hello, World!");
 
         //Render
         window.clear();
         window.draw(title);
-        window.draw(paddle);
+        leftPaddle.draw(&window);
         ball1.draw(&window);
         window.display();
     }
