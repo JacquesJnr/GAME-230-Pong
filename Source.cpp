@@ -7,6 +7,7 @@
 #include <SFML/System.hpp>
 #include <SFML/OpenGL.hpp>
 #include <SFML/Main.hpp>
+#include "Collider.h"
 
 using namespace std;
 
@@ -186,10 +187,10 @@ int main()
         title.setString("Hello, World!");
 
         //Render
-        window.clear();
+        window.clear(sf::Color(150, 150, 150));
         window.draw(title);
-        window.draw(line1);
-        window.draw(line2);
+       // window.draw(line1);
+       // window.draw(line2)
         leftPaddle.draw(&window);
         rightPaddle.draw(&window);
         ball1.draw(&window);
