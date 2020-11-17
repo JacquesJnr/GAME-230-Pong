@@ -181,12 +181,11 @@ int main()
         title.setString("Hello, World!");
 
         //Render
-        window.clear(sf::Color(150, 150, 150));
+        window.clear(sf::Color());
         window.draw(title);
        // window.draw(line1);
        // window.draw(line2)
         newPaddle.draw(window);
-        leftPaddle.draw(&window);
         ball1.draw(&window);
         window.display();
     }
