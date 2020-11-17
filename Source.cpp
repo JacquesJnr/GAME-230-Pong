@@ -70,7 +70,8 @@ int main()
     paddle.setSize(sf::Vector2f(50,150));
     paddle.setFillColor(myGreen);
     paddle.setPosition(100, 100);
-    
+   
+
     //Load Font
     sf::Font font;
     if (!font.loadFromFile("data/Fonts/OpenSans-Regular.ttf")) {
@@ -100,6 +101,21 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+        }
+
+        //Check player input
+
+        sf::Vector2f paddlePos = sf::Vector2f(paddle.getPosition().x, paddle.getPosition().y);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+
+            paddle.setPosition(paddlePos.x, paddlePos.y - SPEED * deltaTime);
+
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+
+            paddle.setPosition(paddlePos.x, paddlePos.y + SPEED *deltaTime);
+
         }
 
         ball1.Update(deltaTime);
