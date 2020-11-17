@@ -65,6 +65,11 @@ int main()
     ball1.shape.setPosition(WIDTH / 2, HEIGHT / 2);
     ball1.velocity = sf::Vector2f(SPEED, SPEED);
 
+    //Create Paddle
+    sf::RectangleShape paddle;
+    paddle.setSize(sf::Vector2f(50,150));
+    paddle.setFillColor(myGreen);
+    paddle.setPosition(100, 100);
     
     //Load Font
     sf::Font font;
@@ -72,12 +77,14 @@ int main()
         return 1;
     }
 
+    //Position Text
     sf::Text title;
     title.setFont(font);
     title.setCharacterSize(12);
     title.setFillColor(sf::Color::Red);
     title.setPosition(0, 40);
 
+    //Define clock
     sf::Clock clock;
     float deltaTime = 0.0f;
 
@@ -96,14 +103,13 @@ int main()
         }
 
         ball1.Update(deltaTime);
-        ball2.Update(deltaTime);
         title.setString("Hello, World!");
 
         //Render
         window.clear();
         window.draw(title);
+        window.draw(paddle);
         ball1.draw(&window);
-        ball2.draw(&window);
         window.display();
     }
 
