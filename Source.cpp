@@ -11,16 +11,63 @@
 using namespace std;
 
 
+const int WIDTH = 1024;
+const int HEIGHT = 768;
+const int SPEED = 500.0f;
+
+struct Ball {
+    sf::CircleShape shape;
+    sf::Vector2f velocity;
+
+    void Update(float deltaTime) {
+
+        auto position = this->shape.getPosition();
+        this->shape.setPosition(position.x + this->velocity.x * deltaTime, position.y + this->velocity.y * deltaTime);
+
+        if (position.y > HEIGHT - this->shape.getRadius() * 2) {
+            this->velocity.y = -abs(this->velocity.y);
+        }
+
+        if (position.y <= 0.0f) {
+            this->velocity.y = abs(this->velocity.y);
+        }
+
+        if (position.x > WIDTH - this->shape.getRadius() * 2) {
+            this->velocity.x = -abs(this->velocity.x);
+        }
+
+        if (position.x <= 0.0f) {
+            this->velocity.x = abs(this->velocity.x);
+        }
+    }
+
+    void draw(sf::RenderWindow* window) {
+        window->draw(this->shape);
+    }
+};
+
+
 int main()
 {
-    const int WIDTH = 1024;
-    const int HEIGHT = 768;
-    const int SPEED = 500.0f;
-
     //Define Window dimensions and program title
     sf::RenderWindow window(sf::VideoMode(1024, 768), "GAME 230 - Pong");
     window.setVerticalSyncEnabled(true);
 
+    sf::Color Purple(90, 24, 154);
+    sf::Color myGreen(45, 194, 67);
+
+    Ball ball1;
+    ball1.shape = sf::CircleShape(25.f);
+    ball1.shape.setFillColor(Purple);
+    ball1.shape.setPosition(WIDTH / 2, HEIGHT / 2);
+    ball1.velocity = sf::Vector2f(SPEED, SPEED);
+
+    Ball ball2;
+    ball2.shape = sf::CircleShape(50.f);
+    ball2.shape.setFillColor(myGreen);
+    ball2.shape.setPosition(100, 100);
+    ball2.velocity = sf::Vector2f(SPEED, SPEED);
+    
     //Load Font
     sf::Font font;
     if (!font.loadFromFile("data/Fonts/OpenSans-Regular.ttf")) {
@@ -33,14 +80,8 @@ int main()
     title.setFillColor(sf::Color::Red);
     title.setPosition(0, 40);
 
-    //Define shape, position & colour
-    sf::CircleShape shape(100.f);
-    shape.setPosition(412, 284);
-    sf::Color Purple(90, 24, 154);
-    shape.setFillColor(Purple);
     sf::Clock clock;
     float deltaTime = 0.0f;
-    sf::Vector2f velocity(0, SPEED);
 
 
     //Update
@@ -48,7 +89,6 @@ int main()
     {
         deltaTime = clock.getElapsedTime().asSeconds();
         clock.restart();
-        cout << deltaTime;
 
         sf::Event event;
         while (window.pollEvent(event))
@@ -57,21 +97,15 @@ int main()
                 window.close();
         }
 
-        auto position = shape.getPosition();
-        shape.setPosition(position.x + velocity.x * deltaTime, position.y + velocity.y * deltaTime);
-
-        if (position.y > HEIGHT - shape.getRadius() * 2) {
-            velocity.y = -SPEED;
-        }
-
-        if (position.y <= 0.0f) {
-            velocity.y = SPEED;
-        }
+        ball1.Update(deltaTime);
+        ball2.Update(deltaTime);
+        title.setString("Hello, World!");
 
         //Render
         window.clear();
         window.draw(title);
-        window.draw(shape);
+        ball1.draw(&window);
+        ball2.draw(&window);
         window.display();
     }
 
