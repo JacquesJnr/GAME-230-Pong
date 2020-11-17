@@ -13,7 +13,8 @@ using namespace std;
 
 const int WIDTH = 1024;
 const int HEIGHT = 768;
-const int SPEED = 500.0f;
+const int _ballSpeed = 500.0f;
+const int _paddleSpeed = 800.0f;
 
 struct Ball {
     sf::CircleShape shape;
@@ -55,16 +56,35 @@ struct Paddle
     sf::Vector2f postion;
     int playerNumber; //Changes what keys the player presses to move their paddle
 
+    //Reads player input and moves the players' paddle
     void movePaddle(int playerNumber, float deltaTime) {
        
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && this->postion.y > 0.0f) {
+        //Player 1 Controls
+        if (playerNumber == 0) {
+            
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && this->postion.y > 0.0f) {
 
-            this->dimensions.setPosition(this->postion.x, this->postion.y - SPEED * deltaTime);
+                this->dimensions.setPosition(this->postion.x, this->postion.y - _paddleSpeed * deltaTime);
+            }
+
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && this->postion.y < (HEIGHT - this->dimensions.getSize().y)) {
+
+                this->dimensions.setPosition(this->postion.x, this->postion.y + _paddleSpeed * deltaTime);
+            }
         }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && this->postion.y < (HEIGHT - this->dimensions.getSize().y)) {
+        //Player 2 Controls
+        if (playerNumber == 1) {
 
-            this->dimensions.setPosition(this->postion.x, this->postion.y + SPEED * deltaTime);
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && this->postion.y > 0.0f) {
+
+                this->dimensions.setPosition(this->postion.x, this->postion.y - _paddleSpeed * deltaTime);
+            }
+
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && this->postion.y < (HEIGHT - this->dimensions.getSize().y)) {
+
+                this->dimensions.setPosition(this->postion.x, this->postion.y + _paddleSpeed * deltaTime);
+            }
         }
     }
 
@@ -84,18 +104,25 @@ int main()
     sf::Color Purple(90, 24, 154);
     sf::Color myGreen(45, 194, 67);
 
+    //Create Ball(s)
     Ball ball1;
     ball1.shape = sf::CircleShape(25.f);
     ball1.shape.setFillColor(Purple);
     ball1.shape.setPosition(WIDTH / 2, HEIGHT / 2);
-    ball1.velocity = sf::Vector2f(SPEED, SPEED);
+    ball1.velocity = sf::Vector2f(_ballSpeed, _ballSpeed);
 
-    //Create Paddle
+    //Create Paddle(s)
     Paddle leftPaddle;
     leftPaddle.dimensions.setSize(sf::Vector2f(50, 150));
     leftPaddle.dimensions.setFillColor(myGreen);
-    leftPaddle.dimensions.setPosition(100, 100);
+    leftPaddle.dimensions.setPosition(50, 100);
     leftPaddle.playerNumber = 0;
+
+    Paddle rightPaddle;
+    rightPaddle.dimensions.setSize(sf::Vector2f(50, 150));
+    rightPaddle.dimensions.setFillColor(myGreen);
+    rightPaddle.dimensions.setPosition(924, 100);
+    rightPaddle.playerNumber = 1;
    
 
     //Load Font
@@ -131,16 +158,19 @@ int main()
 
         //Check player input for paddle
         leftPaddle.postion = sf::Vector2f(leftPaddle.dimensions.getPosition().x, leftPaddle.dimensions.getPosition().y);
+        rightPaddle.postion = sf::Vector2f(rightPaddle.dimensions.getPosition().x, rightPaddle.dimensions.getPosition().y);
         
 
         ball1.Update(deltaTime);
         leftPaddle.movePaddle(leftPaddle.playerNumber, deltaTime);
+        rightPaddle.movePaddle(rightPaddle.playerNumber, deltaTime);
         title.setString("Hello, World!");
 
         //Render
         window.clear();
         window.draw(title);
         leftPaddle.draw(&window);
+        rightPaddle.draw(&window);
         ball1.draw(&window);
         window.display();
     }
