@@ -4,7 +4,7 @@
 class Paddle
 {
 public:
-	Paddle(sf::Vector2f size, sf::Vector2f position);
+	Paddle(sf::Vector2f size, sf::Vector2f position, sf::Color color);
 	~Paddle();
 
 	void draw(sf::RenderWindow& window);
