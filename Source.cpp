@@ -7,6 +7,7 @@
 #include <SFML/System.hpp>
 #include <SFML/OpenGL.hpp>
 #include <SFML/Main.hpp>
+#include "Collider.h"
 
 using namespace std;
 
