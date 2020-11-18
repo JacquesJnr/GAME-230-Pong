@@ -9,6 +9,7 @@
 #include <SFML/Main.hpp>
 #include "Collider.h"
 #include "Paddle.h"
+#include "Ball.h"
 
 using namespace std;
 
@@ -18,7 +19,7 @@ const int HEIGHT = 768;
 const int _ballSpeed = 500.0f;
 const int _paddleSpeed = 800.0f;
 
-struct Ball {
+struct myBall {
     sf::CircleShape shape;
     sf::Vector2f velocity;
 
@@ -66,16 +67,18 @@ int main()
     sf::Color myGreen(45, 194, 67);
 
     //Create Ball(s)
-    Ball ball1;
-    ball1.shape = sf::CircleShape(25.f);
-    ball1.shape.setFillColor(Purple);
-    ball1.shape.setPosition(WIDTH / 2, HEIGHT / 2 - ball1.shape.getRadius() * 2);
-    ball1.velocity = sf::Vector2f(0,0);
+    Ball ball(nullptr, sf::Vector2f(30, 30), sf::Vector2f(center_W ,center_H), sf::Vector2f(_ballSpeed, _ballSpeed));
+
+    myBall ball1;
+    ball1.shape = sf::CircleShape();
+    ball1.shape.setRadius(25);
+    ball1.shape.setPosition(center_W, center_H);
+    ball1.shape.setFillColor(sf::Color::Blue);
+    ball1.velocity = sf::Vector2f(_ballSpeed, _ballSpeed);
 
     //Create Paddle(s)
     Paddle leftPaddle(sf::Vector2f(50,150), sf::Vector2f(50, center_H), myGreen);
     Paddle rightPaddle(sf::Vector2f(50,150), sf::Vector2f(974, center_H), myGreen);
-
 
 
     //Create Dashed Lines
@@ -127,17 +130,18 @@ int main()
         //Check player input for paddle
 
 
-        ball1.Update(deltaTime);
-        title.setString("Hello, World!");
+        title.setString("Hello");
+        static float a = 100;
+        ball.Update(deltaTime);
 
         //Render
         window.clear(sf::Color());
         window.draw(title);
-       // window.draw(line1);
-       // window.draw(line2)
+        window.draw(line1);
+        window.draw(line2);
+        ball.draw(window);
         leftPaddle.draw(window);
         rightPaddle.draw(window);
-        ball1.draw(&window);
         window.display();
     }
 
@@ -145,30 +149,30 @@ int main()
 };
 
 //Player 1 Controls
-    //    if (playerNumber == 0) {
-    //        
-    //        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && this->postion.y > 0.0f) {
-
-    //            this->dimensions.setPosition(this->postion.x, this->postion.y - _paddleSpeed * deltaTime);
-    //        }
-
-    //        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && this->postion.y < (HEIGHT - this->dimensions.getSize().y)) {
-
-    //            this->dimensions.setPosition(this->postion.x, this->postion.y + _paddleSpeed * deltaTime);
-    //        }
-    //    }
-
-    //    //Player 2 Controls
-    //    if (playerNumber == 1) {
-
-    //        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && this->postion.y > 0.0f) {
-
-    //            this->dimensions.setPosition(this->postion.x, this->postion.y - _paddleSpeed * deltaTime);
-    //        }
-
-    //        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && this->postion.y < (HEIGHT - this->dimensions.getSize().y)) {
-
-    //            this->dimensions.setPosition(this->postion.x, this->postion.y + _paddleSpeed * deltaTime);
-    //        }
-    //    }
-    //}
+//        if (playerNumber == 0) {
+//            
+//            if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && this->postion.y > 0.0f) {
+//
+//                this->dimensions.setPosition(this->postion.x, this->postion.y - _paddleSpeed * deltaTime);
+//            }
+//
+//            if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && this->postion.y < (HEIGHT - this->dimensions.getSize().y)) {
+//
+//                this->dimensions.setPosition(this->postion.x, this->postion.y + _paddleSpeed * deltaTime);
+//            }
+//        }
+//
+//        //Player 2 Controls
+//        if (playerNumber == 1) {
+//
+//            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && this->postion.y > 0.0f) {
+//
+//                this->dimensions.setPosition(this->postion.x, this->postion.y - _paddleSpeed * deltaTime);
+//            }
+//
+//            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && this->postion.y < (HEIGHT - this->dimensions.getSize().y)) {
+//
+//                this->dimensions.setPosition(this->postion.x, this->postion.y + _paddleSpeed * deltaTime);
+//            }
+//        }
+//    }
