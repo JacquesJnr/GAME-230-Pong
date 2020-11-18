@@ -13,44 +13,10 @@
 
 using namespace std;
 
-
 const int WIDTH = 1024;
 const int HEIGHT = 768;
 const int _ballSpeed = 500.0f;
 const int _paddleSpeed = 800.0f;
-
-struct myBall {
-    sf::CircleShape shape;
-    sf::Vector2f velocity;
-
-    void Update(float deltaTime) {
-
-        auto position = this->shape.getPosition();
-        this->shape.setPosition(position.x + this->velocity.x * deltaTime, position.y + this->velocity.y * deltaTime);
-
-
-        //Check if the ball touches bounds of window
-        if (position.y > HEIGHT - this->shape.getRadius() * 2) {
-            this->velocity.y = -abs(this->velocity.y);
-        }
-
-        if (position.y <= 0.0f) {
-            this->velocity.y = abs(this->velocity.y);
-        }
-
-        if (position.x > WIDTH - this->shape.getRadius() * 2) {
-            this->velocity.x = -abs(this->velocity.x);
-        }
-
-        if (position.x <= 0.0f) {
-            this->velocity.x = abs(this->velocity.x);
-        }
-    }
-
-    void draw(sf::RenderWindow* window) {
-        window->draw(this->shape);
-    }
-};
 
 int main()
 {
@@ -67,18 +33,11 @@ int main()
     sf::Color myGreen(45, 194, 67);
 
     //Create Ball(s)
-    Ball ball(nullptr, sf::Vector2f(30, 30), sf::Vector2f(center_W ,center_H), sf::Vector2f(_ballSpeed, _ballSpeed));
-
-    myBall ball1;
-    ball1.shape = sf::CircleShape();
-    ball1.shape.setRadius(25);
-    ball1.shape.setPosition(center_W, center_H);
-    ball1.shape.setFillColor(sf::Color::Blue);
-    ball1.velocity = sf::Vector2f(_ballSpeed, _ballSpeed);
+    Ball ball(nullptr, sf::Vector2f(30, 30), sf::Vector2f(center_W ,center_H), sf::Vector2f(0, _ballSpeed));
 
     //Create Paddle(s)
-    Paddle leftPaddle(sf::Vector2f(50,150), sf::Vector2f(50, center_H), myGreen);
-    Paddle rightPaddle(sf::Vector2f(50,150), sf::Vector2f(974, center_H), myGreen);
+    Paddle leftPaddle(sf::Vector2f(20,100), sf::Vector2f(50, center_H), myGreen, 0);
+    Paddle rightPaddle(sf::Vector2f(20,100), sf::Vector2f(974, center_H), myGreen, 1);
 
 
     //Create Dashed Lines
@@ -103,11 +62,15 @@ int main()
     }
 
     //Position Text
-    sf::Text title;
-    title.setFont(font);
-    title.setCharacterSize(12);
-    title.setFillColor(sf::Color::Red);
-    title.setPosition(0, 40);
+    sf::Text ScoreL, ScoreR;
+    ScoreL.setFont(font);
+    ScoreR.setFont(font);
+    ScoreL.setCharacterSize(48);
+    ScoreR.setCharacterSize(48);
+    ScoreL.setFillColor(sf::Color::White);
+    ScoreR.setFillColor(sf::Color::White);
+    ScoreL.setPosition(300, 50);
+    ScoreR.setPosition(724, 50);
 
     //Define clock
     sf::Clock clock;
@@ -128,15 +91,25 @@ int main()
         }
 
         //Check player input for paddle
-
-
-        title.setString("Hello");
-        static float a = 100;
+        ScoreL.setString("0");
+        ScoreR.setString("0");
         ball.Update(deltaTime);
+        leftPaddle.Update(deltaTime, _paddleSpeed);
+        rightPaddle.Update(deltaTime, _paddleSpeed);
+        Collider playerCollisionR = rightPaddle.GetCollider();
+        Collider playerCollisionL = leftPaddle.GetCollider();
+        Collider ballCollisions = ball.GetCollider();
+
+        //ball.GetCollider().CheckCollision(playerCollisionR, 0.9f);
+       // ball.GetCollider().CheckCollision(playerCollisionL, 0.9f);
+        leftPaddle.GetCollider().CheckCollision(ballCollisions, 1);
+        rightPaddle.GetCollider().CheckCollision(ballCollisions, 1);
+
 
         //Render
         window.clear(sf::Color());
-        window.draw(title);
+        window.draw(ScoreL);
+        window.draw(ScoreR);
         window.draw(line1);
         window.draw(line2);
         ball.draw(window);
@@ -148,31 +121,3 @@ int main()
     return 0;
 };
 
-//Player 1 Controls
-//        if (playerNumber == 0) {
-//            
-//            if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && this->postion.y > 0.0f) {
-//
-//                this->dimensions.setPosition(this->postion.x, this->postion.y - _paddleSpeed * deltaTime);
-//            }
-//
-//            if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && this->postion.y < (HEIGHT - this->dimensions.getSize().y)) {
-//
-//                this->dimensions.setPosition(this->postion.x, this->postion.y + _paddleSpeed * deltaTime);
-//            }
-//        }
-//
-//        //Player 2 Controls
-//        if (playerNumber == 1) {
-//
-//            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && this->postion.y > 0.0f) {
-//
-//                this->dimensions.setPosition(this->postion.x, this->postion.y - _paddleSpeed * deltaTime);
-//            }
-//
-//            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && this->postion.y < (HEIGHT - this->dimensions.getSize().y)) {
-//
-//                this->dimensions.setPosition(this->postion.x, this->postion.y + _paddleSpeed * deltaTime);
-//            }
-//        }
-//    }
