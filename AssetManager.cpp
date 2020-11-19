@@ -11,7 +11,7 @@ namespace Pong
 		}
 	}
 
-	sf::Texture &AssetManager::GetTexture(string name)
+	sf::Texture& AssetManager::GetTexture(string name)
 	{
 		return this->_textures.at(name);
 	}
@@ -32,11 +32,16 @@ namespace Pong
 
 	void AssetManager::LoadSound(string name, string path)
 	{
+		sf::SoundBuffer buffer;
+
+		if (buffer.loadFromFile(path)) {
+			this->_sounds[name] = buffer;
+		}
 	}
 
 	sf::SoundBuffer& AssetManager::GetBuffer(string name)
 	{
-		// TODO: insert return statement here
+		return this->_sounds.at(name);
 	}
 
 }
