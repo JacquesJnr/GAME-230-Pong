@@ -1,5 +1,4 @@
 #include "StateMachine.h"
-using namespace std;
 
 namespace Pong 
 {

@@ -5,6 +5,7 @@
 #include "StateMachine.h"
 #include "AssetManager.h"
 #include "InputManager.h"
+#include "State.h"
 using namespace std;
 
 namespace Pong 
@@ -12,7 +13,7 @@ namespace Pong
 	struct Game
 	{
 		StateMachine theMachine;
-		sf::Window window;
+		sf::RenderWindow window;
 		AssetManager asstes;
 		InputManager input;
 	};
