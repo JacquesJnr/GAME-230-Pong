@@ -149,6 +149,8 @@
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="Ball.cpp" />
     <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="GameMaster.cpp" />
+    <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Paddle.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="State.cpp" />
@@ -158,6 +160,8 @@
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Collider.h" />
+    <ClInclude Include="GameMaster.h" />
+    <ClInclude Include="InputManager.h" />
     <ClInclude Include="Paddle.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="StateMachine.h" />
