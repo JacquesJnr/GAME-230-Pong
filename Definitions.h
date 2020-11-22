@@ -1,6 +1,8 @@
 #pragma once
-#define WIDTH 1280
+#define WIDTH 1024
 #define HEIGHT 768
 
-#define SPLASH_STATE_SHOW_TIME 2
-#define SPLASH_IMAGE_FILE_PATH "data\Textures\splash.jpg"
+#define pi 3.14159f
+#define TEXTURE_PATH "data/Textures/"
+#define FONT_PATH "data/Fonts/"
+#define SOUND_PATH "data/Sounds/"
