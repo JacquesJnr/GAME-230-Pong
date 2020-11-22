@@ -4,7 +4,7 @@
 class Paddle
 {
 public:
-	Paddle(sf::Vector2f size, sf::Vector2f position, sf::Color color, int playerNumber);
+	Paddle(sf::Vector2f size, sf::Vector2f position, sf::Texture* image, int playerNumber);
 	~Paddle();
 
 	void Update(float deltaTime, float playerSpeed);

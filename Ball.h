@@ -6,7 +6,7 @@ class Ball
 {
 public:
 
-	Ball(sf::Texture* texture ,sf::Vector2f(size), sf::Vector2f(position), sf::Vector2f (velocity));
+	Ball(sf::Texture* texture ,sf::Vector2f size, sf::Vector2f position, sf::Vector2f velocity);
 
 	void Update(float deltaTime);
 	void draw(sf::RenderWindow& window);
