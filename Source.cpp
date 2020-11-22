@@ -1,57 +1,69 @@
 #include <cmath>
-#include <iostream>
+#include <ctime>
+#include <cstdlib>
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Main.hpp>
+#include "Definitions.h"
 #include "Collider.h"
 #include "Paddle.h"
 #include "Ball.h"
 using namespace std;
 using namespace sf;
 
+
 int main()
 {
-	const int WIDTH = 1024;
-	const int HEIGHT = 768;
-    Vector2f playerPos = Vector2f(50, HEIGHT / 2);
-    Vector2f AIPos = Vector2f( 984 , HEIGHT / 2);
+    Vector2f playerPos(50, HEIGHT / 2);
+    Vector2f AIPos( 984 , HEIGHT / 2);
+    Vector2f playerScorePos(WIDTH / 4, 50);
+    Vector2f AIScorePos(WIDTH - 256, 50);
     Clock clock;
     float deltaTime = 0.0f;
+
     float paddleSpeed = 500.0f;
     float ballSpeed = 500.0f;
-    
-    // Ball Size
-    Vector2f ballSize = Vector2f(25.0f, 25.0f);
-
-    // Colors
-    Color purple = Color(129, 30, 168);
-
+    int _playerScore = 0;
+    int _AIScore = 0;
+   
     // Window
-    RenderWindow gameWindow(VideoMode(WIDTH, HEIGHT), "SFML Pong");
+    RenderWindow gameWindow(VideoMode(WIDTH, HEIGHT), "SFML Pong", sf::Style::Titlebar | sf::Style::Close);
     gameWindow.setVerticalSyncEnabled(true);
 
+    // Ball Size
+    Vector2f ballSize(25.0f, 25.0f);
+
+    // Paddle Size
+    Vector2f paddleSize(30, 150);
+
     // Textures
-    Texture splash, playerPaddleTexture, AI_PaddleTexture, ballTexture, background, line;
+    Texture splash, playerPaddleTexture, AI_PaddleTexture, ballTexture, background, line, keys;
    
     if (!splash.loadFromFile("data/Textures/splash.jpg"))
         return EXIT_FAILURE;
 
-    if (!playerPaddleTexture.loadFromFile("data/Textures/Player.png"))
+    if (!playerPaddleTexture.loadFromFile( TEXTURE_PATH "Player.png"))
         return EXIT_FAILURE;
     
-    if (!AI_PaddleTexture.loadFromFile("data/Textures/AI.png"))
+    if (!AI_PaddleTexture.loadFromFile( TEXTURE_PATH "AI.png"))
         return EXIT_FAILURE;
 
-    if (!ballTexture.loadFromFile("data/Textures/Ball.png"))
+    if (!ballTexture.loadFromFile( TEXTURE_PATH "Ball.png"))
         return EXIT_FAILURE;
 
-    if (!background.loadFromFile("data/Textures/BG.png"))
+    if (!background.loadFromFile( TEXTURE_PATH "BG.png"))
         return EXIT_FAILURE;
 
-    if (!line.loadFromFile("data/Textures/Line.png"))
+    if (!line.loadFromFile(TEXTURE_PATH "Line.png"))
+        return EXIT_FAILURE;
+
+    if (!keys.loadFromFile(TEXTURE_PATH "Keys.png"))
         return EXIT_FAILURE;
   
+    // Sounds
+    SoundBuffer buffer;
+
     // Background
     Sprite BG(background);
 
@@ -59,22 +71,37 @@ int main()
     Sprite centerLines(line);
     centerLines.setPosition(Vector2f(WIDTH / 2, 0));
 
-    // Fonts
+    // Scores
     Font font;
-    if (!font.loadFromFile("data/Fonts/arial.ttf"))
+    if (!font.loadFromFile(FONT_PATH "Poiret.ttf"))
         return EXIT_FAILURE;
-    Text text("Hello SFML", font, 50);
 
-    // Sounds
-    SoundBuffer buffer;
+    Text playerScore(to_string(_playerScore), font, 60);
+    playerScore.setPosition(playerScorePos);
+
+    Text AIScore(to_string(_AIScore), font, 60);
+    AIScore.setPosition(AIScorePos);
+
+    // Pause Menu
+    Sprite arrowMessage(keys);
+    arrowMessage.setPosition(WIDTH / 2, HEIGHT / 2);
+
+    Text pauseMessage;
+    pauseMessage.setFont(font);
+    pauseMessage.setCharacterSize(40);
+    pauseMessage.setPosition(170.f, 150.f);
+    pauseMessage.setFillColor(sf::Color::White);
+
+    pauseMessage.setString("Welcome to SFML pong!\nPress space to start the game");
 
     // Ball(s)
     Ball ball(&ballTexture, ballSize, Vector2f(WIDTH / 2, HEIGHT / 2), Vector2f(0, 0));
 
     // Paddle(s)
-    Paddle playerPaddle(Vector2f(30, 150), playerPos, &playerPaddleTexture, 0);
-    Paddle AIPaddle(Vector2f(30, 150), AIPos, &AI_PaddleTexture, 1);
+    Paddle playerPaddle(paddleSize, playerPos, &playerPaddleTexture, 0);
+    Paddle AIPaddle(paddleSize, AIPos, &AI_PaddleTexture, 1);
     
+    bool isPlaying = false;
     // Start the game loop
     while (gameWindow.isOpen())
     {
@@ -86,9 +113,27 @@ int main()
         Event event;
         while (gameWindow.pollEvent(event))
         {
-            // Close window: exit
-            if (event.type == Event::Closed)
+            // Close window
+            if ((event.type == Event::Closed) || (event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
+            {
                 gameWindow.close();
+                break;
+            }
+
+            // Space key pressed: play
+            if (((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space)))
+            {
+                if (!isPlaying) 
+                {
+
+                    isPlaying = true;
+                    clock.restart();
+
+                    //Reset ball and paddle positions
+                    
+
+                }
+            }
         }
 
         //Update Objects
@@ -102,6 +147,9 @@ int main()
         gameWindow.draw(centerLines);
         // Draw Ball
         ball.draw(gameWindow);
+        // Draw Scores
+        gameWindow.draw(playerScore);
+        gameWindow.draw(AIScore);
         // Draw paddles
         playerPaddle.draw(gameWindow);
         AIPaddle.draw(gameWindow);
