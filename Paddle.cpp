@@ -21,7 +21,7 @@ void Paddle::Update(float deltaTime, float playerSpeed)
 
     if (this->playerNumber == 0) {
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && this->body.getPosition().y > 0.0f) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && this->body.getPosition().y > 0.0f + this->body.getSize().y / 2) {
 
             this->body.setPosition(this->body.getPosition().x, this->body.getPosition().y - playerSpeed * deltaTime);
         }

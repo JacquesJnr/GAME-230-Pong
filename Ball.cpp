@@ -1,37 +1,46 @@
 #include "Ball.h"
 
-Ball::Ball(sf::Texture* texture, sf::Vector2f size, sf::Vector2f position, sf::Vector2f velocity )
+Ball::Ball(sf::Texture* texture, sf::Vector2f size, sf::Vector2f position)
 {
     body.setTexture(texture);
     body.setSize(size);
     body.setPosition(position);
-    this->velocity = velocity;
 }
 
-void Ball::Update(float deltaTime) {
-    
-    int WIDTH = 1024;
-    int HEIGHT = 768;
-    
-    auto position = this->body.getPosition();
-    if (position.y > HEIGHT - body.getSize().y) {
+void Ball::Update(float deltaTime, Paddle otherPaddle) {
 
-        velocity.y = -abs(velocity.y);
+
+    if (otherPaddle.playerNumber == 0) {
+
+        if (this->body.getPosition().x - this->body.getSize().x < otherPaddle.body.getPosition().x + otherPaddle.body.getSize().x / 2 &&
+            this->body.getPosition().x - this->body.getSize().x > otherPaddle.body.getPosition().x &&
+            this->body.getPosition().y + this->body.getSize().y >= otherPaddle.body.getPosition().y - otherPaddle.body.getSize().y / 2 &&
+            this->body.getPosition().y - this->body.getSize().y <= otherPaddle.body.getPosition().y + otherPaddle.body.getSize().y / 2)
+        {
+            if (this->body.getPosition().y > otherPaddle.body.getPosition().y)
+                this->angle = pi - this->angle + (std::rand() % 20) * pi / 180;
+            else
+                this->angle = pi - this->angle - (std::rand() % 20) * pi / 180;
+
+            this->body.setPosition(otherPaddle.body.getPosition().x + this->body.getSize().x + otherPaddle.body.getSize().x / 2 + 0.1f, this->body.getPosition().y);
+        }
     }
-    else if(position.y < 0 - body.getSize().y)
-    {
-        velocity.y = abs(velocity.y);
+
+    if (otherPaddle.playerNumber == 1) {
+
+        if (this->body.getPosition().x + this->body.getSize().x > otherPaddle.body.getPosition().x - otherPaddle.body.getSize().x / 2 &&
+            this->body.getPosition().x + this->body.getSize().x < otherPaddle.body.getPosition().x &&
+            this->body.getPosition().y + this->body.getSize().y >= otherPaddle.body.getPosition().y - otherPaddle.body.getSize().y / 2 &&
+            this->body.getPosition().y - this->body.getSize().y <= otherPaddle.body.getPosition().y + otherPaddle.body.getSize().y / 2)
+        {
+            if (this->body.getPosition().y > otherPaddle.body.getPosition().y)
+                this->angle = pi - this->angle + (std::rand() % 20) * pi / 180;
+            else
+                this->angle = pi - this->angle - (std::rand() % 20) * pi / 180;
+
+            this->body.setPosition(otherPaddle.body.getPosition().x + this->body.getSize().x + otherPaddle.body.getSize().x / 2 + 0.1f, this->body.getPosition().y);
+        }
     }
-    else if(position.x > WIDTH - body.getSize().x)
-    {
-        velocity.x = -abs(velocity.x);
-    }
-    else if (position.x < 0 - body.getSize().x)
-    {
-        velocity.x = abs(velocity.x);
-    }
-    
-    body.setPosition(position.x + this->velocity.x * deltaTime, position.y + this->velocity.y * deltaTime);
 }
 
 

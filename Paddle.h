@@ -12,7 +12,5 @@ public:
 	void Update(float deltaTime, float playerSpeed);
 	void draw(sf::RenderWindow& window);
 	Collider GetCollider() { return Collider(body); }
-
-private:
 	int playerNumber;
 };

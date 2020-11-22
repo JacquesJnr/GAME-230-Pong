@@ -6,7 +6,6 @@
 #include <SFML/System.hpp>
 #include <SFML/Main.hpp>
 #include "Definitions.h"
-#include "Collider.h"
 #include "Paddle.h"
 #include "Ball.h"
 using namespace std;
@@ -26,6 +25,8 @@ int main()
 
     float paddleSpeed = 500.0f;
     float ballSpeed = 500.0f;
+    Vector2f ballPos;
+    float ballAngle = 0.f;
     int _playerScore = 0;
     int _AIScore = 0;
     int alpha = 255;
@@ -93,17 +94,26 @@ int main()
     // Pause Menu
     Sprite arrowMessage(keys);
     arrowMessage.setPosition(320.0f, 300.0f);
+    
+    Text debug;
+    debug.setFont(font);
+    debug.setCharacterSize(20);
+    debug.setPosition(centerScreen);
+    debug.setFillColor(sf::Color::Red);
+    debug.setString("debug");
 
     Text pauseMessage;
     pauseMessage.setFont(font);
-    pauseMessage.setCharacterSize(40);
-    pauseMessage.setPosition(256.0f, 150.f);
+    pauseMessage.setCharacterSize(35);
+    pauseMessage.setPosition(0.f, 0.f);
     pauseMessage.setFillColor(sf::Color::White);
 
-    pauseMessage.setString("Welcome to SFML pong!\nPress the arrow keys start the game");
+    pauseMessage.setString("Welcome to SFML pong!\nPress Up or Down keys start the game");
 
     // Ball(s)
-    Ball ball(&ballTexture, ballSize, centerScreen, Vector2f(0, 0));
+    Ball ball(&ballTexture, ballSize, centerScreen);
+    ball.angle = ballAngle;
+    ball.speed = ballSpeed;
 
     // Paddle(s)
     Paddle playerPaddle(paddleSize, playerPos, &playerPaddleTexture, 0);
@@ -140,10 +150,17 @@ int main()
 
                     //Reset ball and paddle positions
                     playerPaddle.body.setPosition(playerPos);
-                    AIPaddle.body.setPosition(AIPos);
+                    AIPaddle.body.setPosition(Vector2f(WIDTH - 256, 600));
                     ball.body.setPosition(centerScreen);
-                }
 
+                    // Reset the ball angle
+                    do
+                    {
+                        // Make sure the ball initial angle is not too much vertical
+                        ballAngle = (std::rand() % 360) * 2 * pi / 360;
+                    } while (std::abs(std::cos(ballAngle)) < 0.7f);
+
+                }
             }
         }
 
@@ -156,10 +173,37 @@ int main()
                 alpha--;
             }
 
+            ballPos = ball.body.getPosition();
+
+            float factor = ballSpeed * deltaTime;
+            ball.body.move(std::cos(ballAngle) * factor, std::sin(ballAngle) * factor);
+
+            if (ball.body.getPosition().x - ballSize.x < 0.f)
+            {
+                isPlaying = false;
+            }
+            if (ball.body.getPosition().x + ballSize.x > WIDTH)
+            {
+                isPlaying = false;
+            }
+            if (ball.body.getPosition().y - ballSize.y < 0.f)
+            {
+                ballAngle = -ballAngle;
+                ball.body.setPosition(ball.body.getPosition().x, ballSize.x + 0.1f);
+            }
+            if (ball.body.getPosition().y + ballSize.y > HEIGHT)
+            {
+                ballAngle = -ballAngle;
+                ball.body.setPosition(ball.body.getPosition().x, HEIGHT - ballSize.x - 0.1f);
+            }
+
             //Update Objects
             playerPaddle.Update(deltaTime, paddleSpeed);
+          
+            // Paddle Collisions
+            ball.Update(deltaTime, AIPaddle);
+            ball.Update(deltaTime, playerPaddle);
 
-            
         }
 
         // Clear screen
@@ -170,12 +214,11 @@ int main()
         gameWindow.draw(overlay);
 
         if (isPlaying) {
-           
+            // Draw Lines 
+            gameWindow.draw(centerLines);
             // Draw Scores
             gameWindow.draw(playerScore);
             gameWindow.draw(AIScore);
-            // Draw Lines 
-            gameWindow.draw(centerLines);
             // Draw paddles
             playerPaddle.draw(gameWindow);
             AIPaddle.draw(gameWindow);
@@ -184,9 +227,12 @@ int main()
         }
         else
         {
+            // Draw Lines 
+            gameWindow.draw(centerLines);
             // Draw Pause Menu
             gameWindow.draw(pauseMessage);
             gameWindow.draw(arrowMessage);
+
         }
 
         // Update the window
@@ -194,4 +240,3 @@ int main()
     }
     return EXIT_SUCCESS;
 }
-
