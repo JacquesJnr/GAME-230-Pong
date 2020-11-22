@@ -16,8 +16,11 @@ int main()
 	const int HEIGHT = 768;
     Vector2f playerPos = Vector2f(50, HEIGHT / 2);
     Vector2f AIPos = Vector2f( 984 , HEIGHT / 2);
+    Clock clock;
+    float deltaTime = 0.0f;
+    float paddleSpeed = 500.0f;
+    float ballSpeed = 500.0f;
     
-
     // Ball Size
     Vector2f ballSize = Vector2f(25.0f, 25.0f);
 
@@ -25,8 +28,8 @@ int main()
     Color purple = Color(129, 30, 168);
 
     // Window
-    RenderWindow window(VideoMode(WIDTH, HEIGHT), "SFML window");
-
+    RenderWindow gameWindow(VideoMode(WIDTH, HEIGHT), "SFML Pong");
+    gameWindow.setVerticalSyncEnabled(true);
 
     // Textures
     Texture splash, playerPaddleTexture, AI_PaddleTexture, ballTexture, background, line;
@@ -70,36 +73,40 @@ int main()
 
     // Paddle(s)
     Paddle playerPaddle(Vector2f(30, 150), playerPos, &playerPaddleTexture, 0);
-    Paddle AIPaddle(Vector2f(30, 150), AIPos, &AI_PaddleTexture, 0);
+    Paddle AIPaddle(Vector2f(30, 150), AIPos, &AI_PaddleTexture, 1);
     
     // Start the game loop
-    while (window.isOpen())
+    while (gameWindow.isOpen())
     {
+        //Define delta time
+        deltaTime = clock.getElapsedTime().asSeconds();
+        clock.restart();
+
         // Process events
         Event event;
-        while (window.pollEvent(event))
+        while (gameWindow.pollEvent(event))
         {
             // Close window: exit
             if (event.type == Event::Closed)
-                window.close();
+                gameWindow.close();
         }
 
         //Update Objects
-       // playerPaddle.Update()
+        playerPaddle.Update(deltaTime, paddleSpeed);
 
         // Clear screen
-        window.clear();
+        gameWindow.clear();
         // Draw Background
-        window.draw(BG);
+        gameWindow.draw(BG);
         // Draw Lines 
-        window.draw(centerLines);
+        gameWindow.draw(centerLines);
         // Draw Ball
-        ball.draw(window);
+        ball.draw(gameWindow);
         // Draw paddles
-        playerPaddle.draw(window);
-        AIPaddle.draw(window);
+        playerPaddle.draw(gameWindow);
+        AIPaddle.draw(gameWindow);
         // Update the window
-        window.display();
+        gameWindow.display();
     }
     return EXIT_SUCCESS;
 }
