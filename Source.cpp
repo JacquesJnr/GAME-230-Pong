@@ -17,15 +17,18 @@ int main()
 {
     Vector2f playerPos(50, HEIGHT / 2);
     Vector2f AIPos( 984 , HEIGHT / 2);
+    Vector2f centerScreen(WIDTH / 2, HEIGHT / 2);
     Vector2f playerScorePos(WIDTH / 4, 50);
     Vector2f AIScorePos(WIDTH - 256, 50);
     Clock clock;
     float deltaTime = 0.0f;
+    Time currentTime;
 
     float paddleSpeed = 500.0f;
     float ballSpeed = 500.0f;
     int _playerScore = 0;
     int _AIScore = 0;
+    int alpha = 255;
    
     // Window
     RenderWindow gameWindow(VideoMode(WIDTH, HEIGHT), "SFML Pong", sf::Style::Titlebar | sf::Style::Close);
@@ -38,7 +41,7 @@ int main()
     Vector2f paddleSize(30, 150);
 
     // Textures
-    Texture splash, playerPaddleTexture, AI_PaddleTexture, ballTexture, background, line, keys;
+    Texture splash, playerPaddleTexture, AI_PaddleTexture, ballTexture, background, line, keys, greyOverlay;
    
     if (!splash.loadFromFile("data/Textures/splash.jpg"))
         return EXIT_FAILURE;
@@ -60,12 +63,17 @@ int main()
 
     if (!keys.loadFromFile(TEXTURE_PATH "Keys.png"))
         return EXIT_FAILURE;
+
+    if (!greyOverlay.loadFromFile(TEXTURE_PATH "PauseOverlay.png"))
+        return EXIT_FAILURE;
   
     // Sounds
     SoundBuffer buffer;
 
-    // Background
+    // Backgrounds
     Sprite BG(background);
+    Sprite overlay(greyOverlay);
+    overlay.setColor(Color(255, 255, 255, alpha));
 
     // Lines
     Sprite centerLines(line);
@@ -84,18 +92,18 @@ int main()
 
     // Pause Menu
     Sprite arrowMessage(keys);
-    arrowMessage.setPosition(WIDTH / 2, HEIGHT / 2);
+    arrowMessage.setPosition(320.0f, 300.0f);
 
     Text pauseMessage;
     pauseMessage.setFont(font);
     pauseMessage.setCharacterSize(40);
-    pauseMessage.setPosition(170.f, 150.f);
+    pauseMessage.setPosition(256.0f, 150.f);
     pauseMessage.setFillColor(sf::Color::White);
 
-    pauseMessage.setString("Welcome to SFML pong!\nPress space to start the game");
+    pauseMessage.setString("Welcome to SFML pong!\nPress the arrow keys start the game");
 
     // Ball(s)
-    Ball ball(&ballTexture, ballSize, Vector2f(WIDTH / 2, HEIGHT / 2), Vector2f(0, 0));
+    Ball ball(&ballTexture, ballSize, centerScreen, Vector2f(0, 0));
 
     // Paddle(s)
     Paddle playerPaddle(paddleSize, playerPos, &playerPaddleTexture, 0);
@@ -107,6 +115,7 @@ int main()
     {
         //Define delta time
         deltaTime = clock.getElapsedTime().asSeconds();
+        currentTime = clock.getElapsedTime();
         clock.restart();
 
         // Process events
@@ -121,7 +130,7 @@ int main()
             }
 
             // Space key pressed: play
-            if (((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space)))
+            if (((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Up)) || (event.key.code == sf::Keyboard::Down))
             {
                 if (!isPlaying) 
                 {
@@ -130,29 +139,56 @@ int main()
                     clock.restart();
 
                     //Reset ball and paddle positions
-                    
-
+                    playerPaddle.body.setPosition(playerPos);
+                    AIPaddle.body.setPosition(AIPos);
+                    ball.body.setPosition(centerScreen);
                 }
+
             }
         }
 
-        //Update Objects
-        playerPaddle.Update(deltaTime, paddleSpeed);
+        if (isPlaying) 
+        {
+           // float deltaTime = clock.restart().asSeconds();
+
+            if (alpha > 0) {
+                overlay.setColor(sf::Color(255, 255, 255, alpha));
+                alpha--;
+            }
+
+            //Update Objects
+            playerPaddle.Update(deltaTime, paddleSpeed);
+
+            
+        }
 
         // Clear screen
         gameWindow.clear();
+
         // Draw Background
         gameWindow.draw(BG);
-        // Draw Lines 
-        gameWindow.draw(centerLines);
-        // Draw Ball
-        ball.draw(gameWindow);
-        // Draw Scores
-        gameWindow.draw(playerScore);
-        gameWindow.draw(AIScore);
-        // Draw paddles
-        playerPaddle.draw(gameWindow);
-        AIPaddle.draw(gameWindow);
+        gameWindow.draw(overlay);
+
+        if (isPlaying) {
+           
+            // Draw Scores
+            gameWindow.draw(playerScore);
+            gameWindow.draw(AIScore);
+            // Draw Lines 
+            gameWindow.draw(centerLines);
+            // Draw paddles
+            playerPaddle.draw(gameWindow);
+            AIPaddle.draw(gameWindow);
+            // Draw Ball
+            ball.draw(gameWindow);
+        }
+        else
+        {
+            // Draw Pause Menu
+            gameWindow.draw(pauseMessage);
+            gameWindow.draw(arrowMessage);
+        }
+
         // Update the window
         gameWindow.display();
     }

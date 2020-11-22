@@ -14,8 +14,5 @@ public:
 	void Update(float deltaTime);
 	void draw(sf::RenderWindow& window);
 	Collider GetCollider() { return Collider(body); }
-
-private:
-
 };
 
