@@ -1,12 +1,12 @@
 #include "Paddle.h"
 #include "Collider.h"
 
-Paddle::Paddle(sf::Vector2f size, sf::Vector2f position, sf::Color color, int playerNumber)
+Paddle::Paddle(sf::Vector2f size, sf::Vector2f position, sf::Texture* image, int playerNumber)
 {
 	body.setSize(size);
 	body.setOrigin(size / 2.0f);
 	body.setPosition(position);
-	body.setFillColor(color);
+    body.setTexture(image);
     this->playerNumber = playerNumber;
 }
 

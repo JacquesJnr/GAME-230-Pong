@@ -6,7 +6,7 @@ namespace Pong
 	GameMaster::GameMaster(int width, int height, string title)
 	{
 		_gameData->window.create(sf::VideoMode(width, height), title, sf::Style::Close | sf::Style::Titlebar);
-		_gameData->theMachine.AddState(StateRef(new SplashState(this->_data)));
+		//_gameData->theMachine.AddState();
 
 
 		this->Run();
