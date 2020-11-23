@@ -1,6 +1,5 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "Collider.h"
 #include "Paddle.h"
 #include "Definitions.h"
 using namespace std;
