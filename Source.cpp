@@ -83,8 +83,9 @@ int main()
 
     ballHit.setBuffer(sound1);
     gainPoint.setBuffer(sound2);
+    gainPoint.setVolume(40);
     losePoint.setBuffer(sound3);
-    losePoint.setVolume(50);
+    losePoint.setVolume(40);
 
     // Backgrounds
     Sprite BG(background);
@@ -105,6 +106,22 @@ int main()
 
     Text AIScore(to_string(_AIScore), font, 60);
     AIScore.setPosition(AIScorePos);
+
+    // Press ESC 
+    Text pressEsc;
+    pressEsc.setFont(font);
+    pressEsc.setString("Press ESC to close the game");
+    pressEsc.setCharacterSize(14);
+    pressEsc.setPosition(Vector2f(WIDTH - 170, 10));
+    pressEsc.setFillColor(Color(255, 255, 255, 100));
+
+    // Press R
+    Text pressR;
+    pressR.setFont(font);
+    pressR.setString("Press R to restart the game");
+    pressR.setCharacterSize(14);
+    pressR.setPosition(Vector2f(WIDTH - 170, 25));
+    pressR.setFillColor(Color(255,255,255, 100));
 
     // Pause Menu
     Sprite arrowMessage(keys);
@@ -182,7 +199,8 @@ int main()
 
         if (isPlaying) 
         {
-
+            
+        
             if (alpha > 0) {
                 overlay.setColor(sf::Color(255, 255, 255, alpha));
                 alpha--;
@@ -234,6 +252,7 @@ int main()
 
             if (ball.body.getPosition().y - ballSize.y < 0.f)
             {
+                ballHit.setPitch(0.7);
                 ballHit.play();
                 ballAngle = -ballAngle;
                 ball.body.setPosition(ball.body.getPosition().x, ballSize.x + 0.1f);
@@ -241,6 +260,7 @@ int main()
 
             if (ball.body.getPosition().y + ballSize.x > HEIGHT)
             {
+                ballHit.setPitch(0.9);
                 ballHit.play();
                 ballAngle = -ballAngle;
                 ball.body.setPosition(ball.body.getPosition().x, HEIGHT - ballSize.x - 0.1f);
@@ -276,6 +296,16 @@ int main()
                 ballHit.play();
                 ball.body.setPosition(AIPaddle.body.getPosition().x - ballSize.x - paddleSize.x / 2 - 0.1f, ball.body.getPosition().y);
             }
+
+            // Restart
+            if (((event.type == Event::KeyPressed) && (event.key.code == Keyboard::R))) {
+
+                isPlaying = false;
+            }
+            // Declare Winner
+            if (_AIScore == 5 || _playerScore == 5) {
+                isPlaying = false;
+            }
            
         }
 
@@ -289,6 +319,9 @@ int main()
         if (isPlaying) {
             // Draw Lines 
             gameWindow.draw(centerLines);
+            // Draw Text
+            gameWindow.draw(pressEsc);
+            gameWindow.draw(pressR);
             // Draw Scores
             gameWindow.draw(playerScore);
             gameWindow.draw(AIScore);
