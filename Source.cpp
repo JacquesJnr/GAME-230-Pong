@@ -11,7 +11,6 @@
 using namespace std;
 using namespace sf;
 
-
 int main()
 {
     Vector2f playerPos(50, HEIGHT / 2);
@@ -24,9 +23,8 @@ int main()
     Time currentTime;
 
     float paddleSpeed = 500.0f;
-    float ballSpeed = 500.0f;
-    Vector2f ballPos;
     float ballAngle = 0.f;
+    Vector2f ballPos;
     int _playerScore = 0;
     int _AIScore = 0;
     int alpha = 255;
@@ -69,7 +67,24 @@ int main()
         return EXIT_FAILURE;
   
     // Sounds
-    SoundBuffer buffer;
+    SoundBuffer sound1, sound2, sound3;
+
+    if (!sound1.loadFromFile(SOUND_PATH "ballHit.wav"))
+        return EXIT_FAILURE;
+
+    if (!sound2.loadFromFile(SOUND_PATH "gainPoint.wav"))
+        return EXIT_FAILURE;
+
+    if (!sound3.loadFromFile(SOUND_PATH "losePoint.wav"))
+        return EXIT_FAILURE;
+    
+    Sound ballHit;
+    Sound gainPoint, losePoint;
+
+    ballHit.setBuffer(sound1);
+    gainPoint.setBuffer(sound2);
+    losePoint.setBuffer(sound3);
+    losePoint.setVolume(50);
 
     // Backgrounds
     Sprite BG(background);
@@ -112,8 +127,10 @@ int main()
 
     // Ball(s)
     Ball ball(&ballTexture, ballSize, centerScreen);
-    ball.angle = ballAngle;
-    ball.speed = ballSpeed;
+
+    sf::Clock AITime;
+    const Time AITimer = seconds(0.5f);
+    float AIpaddleSpeed = 0.f;
 
     // Paddle(s)
     Paddle playerPaddle(paddleSize, playerPos, &playerPaddleTexture, 0);
@@ -150,13 +167,12 @@ int main()
 
                     //Reset ball and paddle positions
                     playerPaddle.body.setPosition(playerPos);
-                    AIPaddle.body.setPosition(Vector2f(WIDTH - 256, 600));
+                    AIPaddle.body.setPosition(AIPos);
                     ball.body.setPosition(centerScreen);
 
-                    // Reset the ball angle
+                    // Reset ball angle
                     do
                     {
-                        // Make sure the ball initial angle is not too much vertical
                         ballAngle = (std::rand() % 360) * 2 * pi / 360;
                     } while (std::abs(std::cos(ballAngle)) < 0.7f);
 
@@ -166,44 +182,101 @@ int main()
 
         if (isPlaying) 
         {
-           // float deltaTime = clock.restart().asSeconds();
 
             if (alpha > 0) {
                 overlay.setColor(sf::Color(255, 255, 255, alpha));
                 alpha--;
             }
 
-            ballPos = ball.body.getPosition();
-
-            float factor = ballSpeed * deltaTime;
+            float factor = ball.ballSpeed * deltaTime;
             ball.body.move(std::cos(ballAngle) * factor, std::sin(ballAngle) * factor);
 
+            //Move the paddles
+            playerPaddle.Update(deltaTime, paddleSpeed);
+
+            if (((AIpaddleSpeed < 0.f) && (AIPaddle.body.getPosition().y - paddleSize.y / 2 > 5.f)) ||
+                ((AIpaddleSpeed > 0.f) && (AIPaddle.body.getPosition().y + paddleSize.y / 2 < HEIGHT - 5.f)))
+            {
+                AIPaddle.body.move(0.f, AIpaddleSpeed * deltaTime);
+            }
+
+            if (AITime.getElapsedTime() > AITimer)
+            {
+                AITime.restart();
+                if (ball.body.getPosition().y + ball.body.getSize().y > AIPaddle.body.getPosition().y + paddleSize.y / 2)
+                    AIpaddleSpeed = paddleSpeed - 100;
+                else if (ball.body.getPosition().y - ball.body.getSize().y < AIPaddle.body.getPosition().y - paddleSize.y / 2)
+                    AIpaddleSpeed = -paddleSpeed - 100;
+                else
+                    AIpaddleSpeed = 0.f;
+            }
+
+            // Check collisions between the ball and the screen
             if (ball.body.getPosition().x - ballSize.x < 0.f)
             {
-                isPlaying = false;
+                AIScore.setString(to_string(_AIScore += 1));
+                losePoint.play();
+                ball.body.setPosition(centerScreen);
+                ballAngle = (rand() % 360 * 2 * pi / 360);
             }
-            if (ball.body.getPosition().x + ballSize.x > WIDTH)
+            
+            if (ball.body.getPosition().x - ballSize.x >= WIDTH)
             {
-                isPlaying = false;
+                playerScore.setString(to_string(_playerScore += 1));
+                gainPoint.play();
+                ball.body.setPosition(centerScreen);
+                do
+                {
+                    ballAngle = (rand() % 360 * 2 * pi / 360);
+
+                } while (abs(cos(ballAngle)) < 0.7f);
             }
+
             if (ball.body.getPosition().y - ballSize.y < 0.f)
             {
+                ballHit.play();
                 ballAngle = -ballAngle;
                 ball.body.setPosition(ball.body.getPosition().x, ballSize.x + 0.1f);
             }
-            if (ball.body.getPosition().y + ballSize.y > HEIGHT)
+
+            if (ball.body.getPosition().y + ballSize.x > HEIGHT)
             {
+                ballHit.play();
                 ballAngle = -ballAngle;
                 ball.body.setPosition(ball.body.getPosition().x, HEIGHT - ballSize.x - 0.1f);
             }
 
-            //Update Objects
-            playerPaddle.Update(deltaTime, paddleSpeed);
-          
-            // Paddle Collisions
-            ball.Update(deltaTime, AIPaddle);
-            ball.Update(deltaTime, playerPaddle);
+            // Check if ball is colliding with paddles
+            // Players Paddle
+            if (ball.body.getPosition().x - ballSize.x < playerPaddle.body.getPosition().x + 10 &&
+                ball.body.getPosition().x + ballSize.x > playerPaddle.body.getPosition().x &&
+                ball.body.getPosition().y + ballSize.y >= playerPaddle.body.getPosition().y - paddleSize.y / 2 &&
+                ball.body.getPosition().y - ballSize.y <= playerPaddle.body.getPosition().y + paddleSize.y / 2)
+            {
+                if (ball.body.getPosition().y > playerPaddle.body.getPosition().y)
+                    ballAngle = pi - ballAngle + (std::rand() % 20) * pi / 180;
+                else
+                    ballAngle = pi - ballAngle - (std::rand() % 20) * pi / 180;
 
+                ballHit.play();
+                ball.body.setPosition(playerPaddle.body.getPosition().x + ballSize.x + paddleSize.x / 2 + 0.1f, ball.body.getPosition().y);
+            }
+
+            // AI Paddle
+            if (ball.body.getPosition().x + ballSize.x > AIPaddle.body.getPosition().x - paddleSize.x / 2 &&
+                ball.body.getPosition().x + ballSize.x < AIPaddle.body.getPosition().x &&
+                ball.body.getPosition().y + ballSize.y >= AIPaddle.body.getPosition().y - paddleSize.y / 2 &&
+                ball.body.getPosition().y - ballSize.y <= AIPaddle.body.getPosition().y + paddleSize.y / 2)
+            {
+                if (ball.body.getPosition().y > AIPaddle.body.getPosition().y)
+                    ballAngle = pi - ballAngle + (std::rand() % 20) * pi / 180;
+                else
+                    ballAngle = pi - ballAngle - (std::rand() % 20) * pi / 180;
+
+                ballHit.play();
+                ball.body.setPosition(AIPaddle.body.getPosition().x - ballSize.x - paddleSize.x / 2 - 0.1f, ball.body.getPosition().y);
+            }
+           
         }
 
         // Clear screen
@@ -227,8 +300,6 @@ int main()
         }
         else
         {
-            // Draw Lines 
-            gameWindow.draw(centerLines);
             // Draw Pause Menu
             gameWindow.draw(pauseMessage);
             gameWindow.draw(arrowMessage);
