@@ -133,7 +133,6 @@ int main()
     pressSpace.setFont(font);
     pressSpace.setString("Press SPACE to restart the game");
     pressSpace.setCharacterSize(24);
-    pressSpace.setPosition(Vector2f(400, HEIGHT / 2));
 
     // Pause Menu
     Sprite arrowMessage(keys);
@@ -367,10 +366,17 @@ int main()
             }
 
             if (playerWin) 
+            {
                 highlight.setPosition(0, 0);
+                pressSpace.setPosition(180, HEIGHT / 2);
+            }
+               
 
-            if (AIWin)
+            if (AIWin) 
+            {
                 highlight.setPosition(WIDTH - 518, 0);
+                pressSpace.setPosition(550, HEIGHT / 2);
+            }
         }
 
         // Clear screen
