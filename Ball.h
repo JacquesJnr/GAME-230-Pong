@@ -12,7 +12,7 @@ public:
 
 	sf::RectangleShape body;
 	float angle = 0;
-	float ballSpeed = 300;
+	float ballSpeed = 0;
 	sf::Vector2f deltaPos;
 
 

@@ -282,6 +282,7 @@ int main()
             {
                 AIScore.setString(to_string(_AIScore += 1));
                 losePoint.play();
+                ball.ballSpeed = 500;
                 ball.body.setPosition(centerScreen);
                 ballAngle = (rand() % 360 * 2 * pi / 360);
             }
@@ -290,6 +291,7 @@ int main()
             {
                 playerScore.setString(to_string(_playerScore += 1));
                 gainPoint.play();
+                ball.ballSpeed = 500;
                 ball.body.setPosition(centerScreen);
                 do
                 {
@@ -327,6 +329,7 @@ int main()
                     ballAngle = pi - ballAngle - (std::rand() % 20) * pi / 180;
 
                 ballHit.play();
+                ball.ballSpeed += 10;
                 ball.body.setPosition(playerPaddle.body.getPosition().x + ballSize.x + paddleSize.x / 2 + 0.1f, ball.body.getPosition().y);
             }
 
@@ -342,11 +345,12 @@ int main()
                     ballAngle = pi - ballAngle - (std::rand() % 20) * pi / 180;
 
                 ballHit.play();
+                ball.ballSpeed += 10;
                 ball.body.setPosition(AIPaddle.body.getPosition().x - ballSize.x - paddleSize.x / 2 - 0.1f, ball.body.getPosition().y);
             }
 
 
-            // Declare Winner
+            // First to 5 wins
             if (_playerScore == 5) {
                     
                 ball.ballSpeed = 0;
@@ -416,6 +420,7 @@ int main()
 
         }
 
+        // Declare Winner
         if (playerWin || AIWin)
         {
         gameWindow.draw(playerScore);
