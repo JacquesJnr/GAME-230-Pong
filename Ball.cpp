@@ -1,37 +1,42 @@
 #include "Ball.h"
 
-Ball::Ball(sf::Texture* texture, sf::Vector2f size, sf::Vector2f position, sf::Vector2f velocity )
+Ball::Ball(sf::Texture* texture, sf::Vector2f size, sf::Vector2f position)
 {
     body.setTexture(texture);
     body.setSize(size);
     body.setPosition(position);
-    this->velocity = velocity;
 }
 
-void Ball::Update(float deltaTime) {
-    
-    int WIDTH = 1024;
-    int HEIGHT = 768;
-    
-    auto position = this->body.getPosition();
-    if (position.y > HEIGHT - body.getSize().y) {
+void Ball::Update(float deltaTime, Paddle otherPaddle) {
 
-        velocity.y = -abs(velocity.y);
+
+    deltaPos = this->body.getPosition();
+    float sizeX = this->body.getSize().x;
+    float sizeY = this->body.getSize().y;
+
+    float direction = ballSpeed * deltaTime;
+    this->body.move(std::sin(angle) * direction, cos(angle) * direction);
+
+    if (otherPaddle.playerNumber == 1) {
+
+        if (deltaPos.x > otherPaddle.body.getPosition().x + sizeX * 2 &&
+            deltaPos.x < otherPaddle.body.getPosition().x){
+
+            this->angle += 180;
+            
+        }
     }
-    else if(position.y < 0 - body.getSize().y)
-    {
-        velocity.y = abs(velocity.y);
+
+    if (otherPaddle.playerNumber == 0) {
+
+        if (deltaPos.x > otherPaddle.body.getPosition().x - sizeX * 2 &&
+            deltaPos.x < otherPaddle.body.getPosition().x) {
+
+            angle += 180;
+
+        }
     }
-    else if(position.x > WIDTH - body.getSize().x)
-    {
-        velocity.x = -abs(velocity.x);
-    }
-    else if (position.x < 0 - body.getSize().x)
-    {
-        velocity.x = abs(velocity.x);
-    }
-    
-    body.setPosition(position.x + this->velocity.x * deltaTime, position.y + this->velocity.y * deltaTime);
+   
 }
 
 

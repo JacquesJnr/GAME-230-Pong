@@ -21,7 +21,7 @@ void Paddle::Update(float deltaTime, float playerSpeed)
 
     if (this->playerNumber == 0) {
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && this->body.getPosition().y > 0.0f) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && this->body.getPosition().y > 0.0f + this->body.getSize().y / 2) {
 
             this->body.setPosition(this->body.getPosition().x, this->body.getPosition().y - playerSpeed * deltaTime);
         }
@@ -35,16 +35,9 @@ void Paddle::Update(float deltaTime, float playerSpeed)
     
     else if (this->playerNumber == 1) {
  
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && this->body.getPosition().y > 0.0f) {
+       
 
-            this->body.setPosition(this->body.getPosition().x, this->body.getPosition().y - playerSpeed * deltaTime);
-        }
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && this->body.getPosition().y < (768 - (this->body.getSize().y / 2))) {
-
-            this->body.setPosition(this->body.getPosition().x, this->body.getPosition().y + playerSpeed * deltaTime);
-        }
-
+        
     }
     
 }
