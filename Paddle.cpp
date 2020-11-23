@@ -1,6 +1,4 @@
 #include "Paddle.h"
-#include "Collider.h"
-
 Paddle::Paddle(sf::Vector2f size, sf::Vector2f position, sf::Texture* image, int playerNumber)
 {
 	body.setSize(size);

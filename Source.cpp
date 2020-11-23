@@ -40,11 +40,8 @@ int main()
     Vector2f paddleSize(30, 150);
 
     // Textures
-    Texture splash, playerPaddleTexture, AI_PaddleTexture, ballTexture, background, line, keys, greyOverlay;
+    Texture  playerPaddleTexture, AI_PaddleTexture, ballTexture, background, line, keys, greyOverlay, greenOverlay;
    
-    if (!splash.loadFromFile("data/Textures/splash.jpg"))
-        return EXIT_FAILURE;
-
     if (!playerPaddleTexture.loadFromFile( TEXTURE_PATH "Player.png"))
         return EXIT_FAILURE;
     
@@ -66,6 +63,9 @@ int main()
     if (!greyOverlay.loadFromFile(TEXTURE_PATH "PauseOverlay.png"))
         return EXIT_FAILURE;
   
+    if (!greenOverlay.loadFromFile(TEXTURE_PATH "highlight.png"))
+        return EXIT_FAILURE;
+
     // Sounds
     SoundBuffer sound1, sound2, sound3;
 
@@ -90,6 +90,7 @@ int main()
     // Backgrounds
     Sprite BG(background);
     Sprite overlay(greyOverlay);
+    Sprite highlight(greenOverlay);
     overlay.setColor(Color(255, 255, 255, alpha));
 
     // Lines
@@ -101,10 +102,14 @@ int main()
     if (!font.loadFromFile(FONT_PATH "Poiret.ttf"))
         return EXIT_FAILURE;
 
-    Text playerScore(to_string(_playerScore), font, 60);
+    Text playerScore;
+    playerScore.setFont(font);
+    playerScore.setCharacterSize(60);
     playerScore.setPosition(playerScorePos);
 
-    Text AIScore(to_string(_AIScore), font, 60);
+    Text AIScore;
+    AIScore.setFont(font);
+    AIScore.setCharacterSize(60);
     AIScore.setPosition(AIScorePos);
 
     // Press ESC 
@@ -122,6 +127,13 @@ int main()
     pressR.setCharacterSize(14);
     pressR.setPosition(Vector2f(WIDTH - 170, 25));
     pressR.setFillColor(Color(255,255,255, 100));
+
+    // Press SPACE
+    Text pressSpace;
+    pressSpace.setFont(font);
+    pressSpace.setString("Press SPACE to restart the game");
+    pressSpace.setCharacterSize(24);
+    pressSpace.setPosition(Vector2f(400, HEIGHT / 2));
 
     // Pause Menu
     Sprite arrowMessage(keys);
@@ -145,15 +157,23 @@ int main()
     // Ball(s)
     Ball ball(&ballTexture, ballSize, centerScreen);
 
-    sf::Clock AITime;
+    // AI Update time
+    Clock AITime;
     const Time AITimer = seconds(0.5f);
     float AIpaddleSpeed = 0.f;
+
+    // Win Display Timer
+    Clock winclock;
+    const Time winTimer = seconds(1);
+
 
     // Paddle(s)
     Paddle playerPaddle(paddleSize, playerPos, &playerPaddleTexture, 0);
     Paddle AIPaddle(paddleSize, AIPos, &AI_PaddleTexture, 1);
     
     bool isPlaying = false;
+    bool playerWin = false;
+    bool AIWin = false;
     // Start the game loop
     while (gameWindow.isOpen())
     {
@@ -173,7 +193,7 @@ int main()
                 break;
             }
 
-            // Space key pressed: play
+            // Up or down key to play
             if (((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Up)) || (event.key.code == sf::Keyboard::Down))
             {
                 if (!isPlaying) 
@@ -181,6 +201,18 @@ int main()
 
                     isPlaying = true;
                     clock.restart();
+
+                    if (alpha == 0) {
+                        alpha = 255;
+                    }
+
+                    _AIScore = 0;
+                    AIScore.setString(to_string(_AIScore));
+                    _playerScore = 0;
+                    playerScore.setString(to_string(_playerScore));
+
+                    AIWin = false;
+                    playerWin = false;
 
                     //Reset ball and paddle positions
                     playerPaddle.body.setPosition(playerPos);
@@ -195,18 +227,35 @@ int main()
 
                 }
             }
+
+            if (isPlaying) {
+                // Hard Restart
+                if (((event.type == Event::KeyPressed) && (event.key.code == Keyboard::R))) {
+
+                    isPlaying = false;
+                }
+            }
+
+            if (playerWin || AIWin) {
+                // Restart at the end of the game
+                if(((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space))){
+                    AIWin = false;
+                    playerWin = false;
+                    isPlaying = false;
+                }
+            }
         }
 
         if (isPlaying) 
         {
-            
-        
+                    
             if (alpha > 0) {
                 overlay.setColor(sf::Color(255, 255, 255, alpha));
                 alpha--;
             }
 
             float factor = ball.ballSpeed * deltaTime;
+            ball.ballSpeed = 500;
             ball.body.move(std::cos(ballAngle) * factor, std::sin(ballAngle) * factor);
 
             //Move the paddles
@@ -297,16 +346,31 @@ int main()
                 ball.body.setPosition(AIPaddle.body.getPosition().x - ballSize.x - paddleSize.x / 2 - 0.1f, ball.body.getPosition().y);
             }
 
-            // Restart
-            if (((event.type == Event::KeyPressed) && (event.key.code == Keyboard::R))) {
 
-                isPlaying = false;
-            }
             // Declare Winner
-            if (_AIScore == 5 || _playerScore == 5) {
-                isPlaying = false;
+            if (_playerScore == 5) {
+                    
+                ball.ballSpeed = 0;
+                if (!playerWin) {
+                    winclock.restart();
+                    playerWin = true;
+                }
             }
-           
+
+            if (_AIScore == 5) {
+                
+                ball.ballSpeed = 0;
+                if (!AIWin) {
+                    winclock.restart();
+                    AIWin = true;
+                }
+            }
+
+            if (playerWin) 
+                highlight.setPosition(0, 0);
+
+            if (AIWin)
+                highlight.setPosition(WIDTH - 518, 0);
         }
 
         // Clear screen
@@ -330,6 +394,13 @@ int main()
             AIPaddle.draw(gameWindow);
             // Draw Ball
             ball.draw(gameWindow);
+            
+            if (playerWin) {
+                gameWindow.draw(highlight);
+            }
+            if (AIWin) {
+                gameWindow.draw(highlight);
+            }
         }
         else
         {
@@ -338,6 +409,14 @@ int main()
             gameWindow.draw(arrowMessage);
 
         }
+
+        if (playerWin || AIWin)
+        {
+        gameWindow.draw(playerScore);
+        gameWindow.draw(AIScore);
+        gameWindow.draw(highlight);
+        gameWindow.draw(pressSpace);
+        }        
 
         // Update the window
         gameWindow.display();

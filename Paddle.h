@@ -1,6 +1,5 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "Collider.h"
 class Paddle
 {
 public:
@@ -11,6 +10,5 @@ public:
 
 	void Update(float deltaTime, float playerSpeed);
 	void draw(sf::RenderWindow& window);
-	Collider GetCollider() { return Collider(body); }
 	int playerNumber;
 };
